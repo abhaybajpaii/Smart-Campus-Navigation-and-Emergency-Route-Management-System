@@ -1,0 +1,1997 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-900 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Campus Navigation & Emergency Route System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar Styles for Sleek Dark Theme UI */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        /* Custom glow animations for active navigation routes */
+        @keyframes pathGlow {
+            0%, 100% { filter: drop-shadow(0 0 4px #e11d48); }
+            50% { filter: drop-shadow(0 0 12px #f43f5e); }
+        }
+        .active-path-glow {
+            animation: pathGlow 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans antialiased text-slate-200">
+
+    <!-- Top Premium Navigation Bar -->
+    <header class="bg-slate-950 border-b border-slate-800 shrink-0 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-tr from-rose-600 to-amber-500 p-2.5 rounded-xl text-white shadow-lg shadow-rose-950/40">
+                <i class="fa-solid fa-map-location-dot text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                    SMART CAMPUS NAVIGATOR <span class="text-xs bg-rose-500/20 text-rose-400 font-semibold px-2 py-0.5 rounded border border-rose-500/30 uppercase tracking-widest">DSA Project</span>
+                </h1>
+                <p class="text-xs text-slate-400">Emergency Route Management & Data Structure Analyzer</p>
+            </div>
+        </div>
+        
+        <!-- Live Statistics Badges -->
+        <div class="hidden md:flex items-center space-x-6">
+            <div class="flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs text-slate-300 font-medium uppercase tracking-wider">System Live</span>
+            </div>
+            <div class="h-6 w-px bg-slate-800"></div>
+            <div class="text-right">
+                <span class="text-[10px] text-slate-400 block uppercase font-bold tracking-widest">Active Core</span>
+                <span class="text-xs font-mono font-bold text-amber-400">Dijkstra & Binary Min-Heap</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Workplace Dashboard Layout -->
+    <main class="flex-1 overflow-hidden grid grid-cols-1 xl:grid-cols-12 gap-0">
+        
+        <!-- ================= LEFT CONFIGURATION PANEL (xl:col-span-3) ================= -->
+        <section class="xl:col-span-3 bg-slate-900 border-r border-slate-800 overflow-y-auto flex flex-col p-5 space-y-6">
+            
+            <!-- Dynamic Stats Summary Grid -->
+            <div>
+                <h3 class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-3">Campus Statistics</h3>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800 text-center">
+                        <span class="text-xl font-extrabold text-indigo-400 block" id="stat-nodes">11</span>
+                        <span class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Nodes</span>
+                    </div>
+                    <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800 text-center">
+                        <span class="text-xl font-extrabold text-cyan-400 block" id="stat-edges">16</span>
+                        <span class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Roads</span>
+                    </div>
+                    <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800 text-center relative overflow-hidden group">
+                        <span class="text-xl font-extrabold text-rose-500 block" id="stat-blocks">0</span>
+                        <span class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Blocked</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Path Finder Card Controls -->
+            <div class="bg-slate-950/60 rounded-2xl border border-slate-800 p-4 space-y-4 shadow-inner">
+                <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-route text-rose-500"></i> Route Finder
+                    </h3>
+                    <span class="text-[10px] bg-slate-800 text-slate-300 font-mono px-1.5 py-0.5 rounded">O(E log V)</span>
+                </div>
+                
+                <!-- Source Node Selection -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Source Node Selection</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-500">
+                            <i class="fa-solid fa-location-crosshairs text-xs"></i>
+                        </span>
+                        <select id="path-source" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-4 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors">
+                            <!-- Dynamic Population -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Destination Node Selection -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Destination Node Selection</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-rose-500">
+                            <i class="fa-solid fa-flag-checkered text-xs"></i>
+                        </span>
+                        <select id="path-dest" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-4 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors">
+                            <!-- Dynamic Population -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Routing Buttons -->
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button id="btn-find-path" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 active:scale-95 text-white font-semibold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-950/50 transition-all">
+                        <i class="fa-solid fa-magnifying-glass-location"></i> Quick Find
+                    </button>
+                    <button id="btn-visualize-path" class="bg-slate-800 hover:bg-slate-700 text-slate-200 active:scale-95 font-semibold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 border border-slate-700 transition-all">
+                        <i class="fa-solid fa-circle-play text-amber-500 animate-pulse"></i> Step Visualizer
+                    </button>
+                </div>
+            </div>
+
+            <!-- Emergency Actions Panel -->
+            <div class="bg-slate-950/60 rounded-2xl border border-rose-950/60 p-4 space-y-3 relative overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 text-rose-500/5 text-8xl pointer-events-none">
+                    <i class="fa-solid fa-truck-medical"></i>
+                </div>
+                <div class="flex items-center space-x-2 border-b border-rose-900/40 pb-2">
+                    <div class="w-2 h-2 rounded-full bg-red-500 animate-ping"></div>
+                    <h3 class="text-sm font-bold text-rose-400 flex items-center gap-1.5 uppercase tracking-wide">
+                        Emergency Hotkeys
+                    </h3>
+                </div>
+                <p class="text-[11px] text-slate-400 leading-relaxed">
+                    Instantly compute Dijkstra paths to the nearest available emergency services relative to the currently selected starting point.
+                </p>
+                <div class="space-y-2 pt-1">
+                    <button onclick="triggerEmergency('medical')" class="w-full bg-rose-950/50 hover:bg-rose-900/60 border border-rose-900/80 hover:border-rose-500 text-rose-200 font-bold text-xs py-2.5 px-4 rounded-xl flex items-center justify-between transition-all group active:scale-[0.98]">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-house-medical text-rose-500 group-hover:scale-110 transition-transform"></i> Route to Nearest Medical Room
+                        </span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-rose-400"></i>
+                    </button>
+                    <button onclick="triggerEmergency('security')" class="w-full bg-amber-950/50 hover:bg-amber-900/60 border border-amber-900/80 hover:border-amber-500 text-amber-200 font-bold text-xs py-2.5 px-4 rounded-xl flex items-center justify-between transition-all group active:scale-[0.98]">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved text-amber-500 group-hover:scale-110 transition-transform"></i> Route to Nearest Security Post
+                        </span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-amber-400"></i>
+                    </button>
+                    <button onclick="triggerEmergency('gate')" class="w-full bg-teal-950/50 hover:bg-teal-900/60 border border-teal-900/80 hover:border-teal-500 text-teal-200 font-bold text-xs py-2.5 px-4 rounded-xl flex items-center justify-between transition-all group active:scale-[0.98]">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-door-open text-teal-400 group-hover:scale-110 transition-transform"></i> Route to Closest Main Gate
+                        </span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-teal-300"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Road Blocking Controls Panel -->
+            <div class="bg-slate-950/60 rounded-2xl border border-slate-800 p-4 space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Campus Obstructions
+                    </h3>
+                </div>
+                <p class="text-[11px] text-slate-400 leading-relaxed">
+                    Simulate real-time construction or accidents. Check an edge to strip it from path computations or tap paths directly on the map coordinate.
+                </p>
+                <div class="max-h-40 overflow-y-auto pr-1 space-y-1.5" id="block-roads-list">
+                    <!-- Loaded dynamically in JavaScript -->
+                </div>
+                <button id="btn-clear-blocks" class="w-full bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-medium text-[11px] py-1.5 rounded-lg transition-colors">
+                    Clear All Obstructions
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= CENTER INTERACTIVE MAP VISUALIZER (xl:col-span-6) ================= -->
+        <section class="xl:col-span-6 flex flex-col bg-slate-950 border-b xl:border-b-0 border-slate-800 relative min-h-[450px]">
+            
+            <!-- Canvas Map Control Bar Overlay -->
+            <div class="absolute top-4 left-4 right-4 z-10 flex flex-wrap gap-2 items-center justify-between pointer-events-none">
+                <div class="bg-slate-900/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-slate-800 shadow-xl pointer-events-auto flex items-center gap-3">
+                    <span class="text-xs font-bold text-slate-300">Campus Map Layout</span>
+                    <div class="flex items-center gap-1 text-[10px] text-slate-400 border-l border-slate-800 pl-3">
+                        <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-[7px] text-indigo-500"></i> Drag nodes</span>
+                        <span class="mx-1">•</span>
+                        <span class="flex items-center gap-1"><i class="fa-solid fa-bolt text-[7px] text-emerald-400"></i> Tap edge to block</span>
+                    </div>
+                </div>
+                
+                <div class="bg-slate-900/95 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 shadow-xl pointer-events-auto flex items-center gap-2">
+                    <button onclick="resetCampusMapPosition()" class="p-1 hover:bg-slate-800 rounded text-slate-300 hover:text-white text-xs transition-colors" title="Reset Viewport">
+                        <i class="fa-solid fa-arrows-rotate"></i> Reset Map Position
+                    </button>
+                </div>
+            </div>
+
+            <!-- Canvas Render Box Container -->
+            <div class="flex-1 w-full relative overflow-hidden" id="canvas-container">
+                <canvas id="campus-canvas" class="block w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+            </div>
+
+            <!-- Active Output / Action Notifications Banner -->
+            <div id="output-banner" class="bg-slate-900 border-t border-slate-800 px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 rounded-lg bg-indigo-950/60 border border-indigo-900 text-indigo-400" id="output-banner-icon">
+                        <i class="fa-solid fa-compass text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-wider font-bold block" id="output-banner-pre">System Message</span>
+                        <span class="text-sm font-semibold text-slate-200" id="output-banner-msg">Select locations in the sidebar or click nodes on the canvas map to begin charting a path.</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 shrink-0 font-mono" id="output-banner-data">
+                    <!-- Distance details and runtime metrics injected dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= RIGHT DATA STRUCTURE INSPECTOR PANEL (xl:col-span-3) ================= -->
+        <section class="xl:col-span-3 bg-slate-900 border-l border-slate-800 overflow-y-auto flex flex-col p-5 space-y-6">
+            
+            <!-- Tabbed Inspector Panel Header -->
+            <div>
+                <h3 class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-microchip text-indigo-400"></i> DSA Runtime Inspector
+                </h3>
+                
+                <!-- Dynamic Selection Tabs -->
+                <div class="flex space-x-1 bg-slate-950/60 p-1.5 rounded-xl border border-slate-800">
+                    <button onclick="switchTab('graph')" id="tab-graph" class="flex-1 text-center py-1.5 text-[10px] font-bold tracking-wider uppercase rounded-lg transition-all text-white bg-indigo-600 shadow-md shadow-indigo-950/40">
+                        Graph
+                    </button>
+                    <button onclick="switchTab('queue')" id="tab-queue" class="flex-1 text-center py-1.5 text-[10px] font-bold tracking-wider uppercase rounded-lg transition-all text-slate-400 hover:text-slate-200">
+                        Queue
+                    </button>
+                    <button onclick="switchTab('stack')" id="tab-stack" class="flex-1 text-center py-1.5 text-[10px] font-bold tracking-wider uppercase rounded-lg transition-all text-slate-400 hover:text-slate-200">
+                        Stack
+                    </button>
+                </div>
+            </div>
+
+            <!-- ================= INSPECTOR CONTENT BOXES ================= -->
+
+            <!-- PANEL A: Graph (HashMap & Adjacency List Structure) -->
+            <div id="inspector-graph" class="space-y-4">
+                <!-- Custom HashMap Hashing Viewer Section -->
+                <div class="bg-slate-950/50 border border-slate-800 rounded-xl p-3.5 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-300">Campus Hash Table Map</span>
+                        <span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">Index Collision Sim</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 leading-tight">
+                        Visualizing how String node names map to IDs using standard hash buckets modulo 8.
+                    </p>
+                    <div class="max-h-36 overflow-y-auto space-y-1 pt-1 text-slate-300" id="hashmap-viewer-bucket">
+                        <!-- Loaded dynamically via HashMap representation -->
+                    </div>
+                </div>
+
+                <!-- Live Adjacency List (Graph Weights) Structure -->
+                <div class="bg-slate-950/50 border border-slate-800 rounded-xl p-3.5 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-300">Adjacency List (Weights)</span>
+                        <span class="text-[10px] text-indigo-400 font-mono font-bold">Map&lt;ID, LinkedList&gt;</span>
+                    </div>
+                    <div class="max-h-64 overflow-y-auto space-y-1.5 pr-1 font-mono text-[10px]" id="adjlist-viewer">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL B: Request Dispatch Queue Manager -->
+            <div id="inspector-queue" class="space-y-4 hidden">
+                <div class="bg-slate-950/50 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold text-slate-300 uppercase">Service Buffer Dispatcher</h4>
+                        <span class="text-[10px] bg-indigo-950 border border-indigo-800 text-indigo-300 font-bold font-mono px-2 py-0.5 rounded">First-In-First-Out</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 leading-relaxed">
+                        Incoming search requests generated by students, facility operations, or smart transit systems. Simulates standard FIFO Queue logic.
+                    </p>
+                    
+                    <!-- Quick Actions -->
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button onclick="enqueueMockRequest()" class="bg-indigo-900/60 hover:bg-indigo-900/80 border border-indigo-800 text-indigo-200 font-semibold text-xs py-2 rounded-lg transition-colors">
+                            Enqueue Request
+                        </button>
+                        <button onclick="dequeueRequest()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-semibold text-xs py-2 rounded-lg transition-colors">
+                            Process Head
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Queue Display Box -->
+                <div class="bg-slate-950/50 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-300">Live Buffer Array Queue</span>
+                        <span class="text-[10px] text-amber-400 font-mono" id="queue-length-badge">0 requests</span>
+                    </div>
+                    <div class="flex flex-col space-y-2 max-h-72 overflow-y-auto pr-1" id="queue-display-container">
+                        <!-- Dynamic elements -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL C: Navigation Search Stack History -->
+            <div id="inspector-stack" class="space-y-4 hidden">
+                <div class="bg-slate-950/50 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold text-slate-300 uppercase font-mono">Traceback Stack Trace</h4>
+                        <span class="text-[10px] bg-rose-950 border border-rose-800 text-rose-300 font-bold font-mono px-2 py-0.5 rounded">Last-In-First-Out</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 leading-relaxed">
+                        Tracks history logs. Demonstrates stack frames: `Push` stores active paths, `Pop` removes the recent trace, and clicking a trace re-runs calculations.
+                    </p>
+                    
+                    <button onclick="popStackHistory()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-semibold text-xs py-2 rounded-lg transition-colors">
+                        Pop Recent History Frame
+                    </button>
+                </div>
+
+                <!-- Visual Stack Rendering -->
+                <div class="bg-slate-950/50 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <span class="text-xs font-bold text-slate-300 block">Stack Layout (Top Frame down)</span>
+                    <div class="flex flex-col space-y-1.5 max-h-72 overflow-y-auto pr-1" id="stack-display-container">
+                        <!-- Dynamic historical frames -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= SUB-PANEL: DIJKSTRA heap debugger ================= -->
+            <div id="heap-debugger-panel" class="bg-slate-950/50 border border-slate-800 rounded-xl p-3.5 space-y-2 hidden">
+                <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                    <span class="text-xs font-bold text-slate-300 flex items-center gap-1">
+                        <i class="fa-solid fa-code-merge text-amber-500"></i> Min-Heap Priority Queue
+                    </span>
+                    <span class="text-[9px] text-slate-400 font-mono" id="heap-size-badge">size: 0</span>
+                </div>
+                <div class="text-[10px] text-slate-400 leading-normal">
+                    This min-heap tracks node expansion weights dynamically during algorithm iterations.
+                </div>
+                <!-- Visual heap nodes -->
+                <div class="py-2 flex flex-wrap gap-1.5" id="heap-nodes-visualizer">
+                    <!-- Dynamic heap nodes mapping -->
+                </div>
+                <!-- Live Distance state table tracker -->
+                <div class="text-[10px] font-mono border-t border-slate-800 pt-2 space-y-1" id="dijkstra-state-dist">
+                    <!-- Dynamic details -->
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Modals & Alert Triggers for Sandbox Interactions (Zero System Alerts) -->
+    <div id="custom-alert-box" class="fixed bottom-6 left-6 max-w-sm bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-4 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 flex items-start gap-3">
+        <div class="p-2 rounded-lg bg-indigo-950/80 border border-indigo-900 text-indigo-400 shrink-0" id="alert-icon">
+            <i class="fa-solid fa-circle-info"></i>
+        </div>
+        <div class="flex-1">
+            <span class="text-xs font-bold text-slate-200 block" id="alert-title">Notification</span>
+            <span class="text-[11px] text-slate-400 leading-relaxed block mt-0.5" id="alert-message">Alert details go here.</span>
+        </div>
+        <button onclick="dismissAlert()" class="text-slate-500 hover:text-slate-300 text-xs self-start p-1">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <!-- Instructions / Installation / Interactive Guide Section Overlay Toggle -->
+    <footer class="bg-slate-950 border-t border-slate-800 px-6 py-3 text-xs text-slate-500 flex flex-col md:flex-row items-center justify-between gap-2 shrink-0">
+        <div>
+            Smart Campus Navigation &copy; 2026 • Designed for Academic DSA Projects.
+        </div>
+        <div class="flex space-x-4">
+            <button onclick="toggleSetupModal(true)" class="hover:text-slate-300 transition-colors flex items-center gap-1 font-medium">
+                <i class="fa-solid fa-circle-info text-rose-500"></i> Setup & Documentation
+            </button>
+        </div>
+    </footer>
+
+    <!-- DOCUMENTATION / RUN INSTRUCTIONS MODAL -->
+    <div id="doc-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="bg-slate-950 p-5 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-circle-question text-rose-500 text-lg"></i>
+                    <h2 class="text-base font-extrabold text-white">DSA Academic Project Portfolio & Setup Guide</h2>
+                </div>
+                <button onclick="toggleSetupModal(false)" class="text-slate-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto space-y-5 text-sm leading-relaxed text-slate-300">
+                <div>
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-rose-400 mb-2">1. Realized Data Structures</h4>
+                    <ul class="list-disc pl-5 space-y-1.5 text-xs text-slate-400">
+                        <li><strong class="text-slate-200">Campus Graph (Adjacency List):</strong> Managed via a structured Node & Edge map allowing dynamic edge operations (blocking, unblocking).</li>
+                        <li><strong class="text-slate-200">Custom HashMap:</strong> Maps arbitrary string labels (e.g. "Canteen") to array node ID buckets, simulating hashing algorithms and collisions dynamically.</li>
+                        <li><strong class="text-slate-200">Binary Min-Heap Priority Queue:</strong> Custom array-based tree implementation driving Dijkstra's shortest paths without third-party frameworks.</li>
+                        <li><strong class="text-slate-200">Navigation History Stack:</strong> LIFO buffer capturing paths computed, letting you rewind and review traces in real-time.</li>
+                        <li><strong class="text-slate-200">Buffer Dispatcher Queue:</strong> FIFO structure allowing asynchronous path inquiries from around the college ecosystem.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-amber-400 mb-2">2. Local Run & Deployment</h4>
+                    <p class="text-xs text-slate-400 mb-3">
+                        Since this academic client contains fully compiled structures in client-side Javascript, it runs natively on any modern browser! You can run it instantly without configuring physical virtualenvs or Flask servers.
+                    </p>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-[11px] text-slate-300 space-y-1">
+                        <div class="text-emerald-400"># To run instantly without setup:</div>
+                        <div>Double-click standard <span class="text-slate-100">index.html</span> directly in your browser.</div>
+                        <div class="text-emerald-400 mt-2"># If a Python Flask Backend is absolutely required:</div>
+                        <div>1. Save this script inside standard flask folders.</div>
+                        <div>2. Map endpoints matching: <span class="text-amber-500">/api/shortest-path</span>, <span class="text-amber-500">/api/block-road</span>, etc.</div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-teal-400 mb-2">3. Interactive Testing Plan</h4>
+                    <ul class="list-decimal pl-5 space-y-1.5 text-xs text-slate-400">
+                        <li>Select a source node like <strong class="text-slate-200">Main Gate</strong> and destination like <strong class="text-slate-200">Hostel</strong>. Click <strong class="text-slate-300">Quick Find</strong>.</li>
+                        <li>Click <strong class="text-slate-300">Step Visualizer</strong> to trace heap pop actions and distance relaxation tables dynamically.</li>
+                        <li>Toggle a roadblock directly by clicking a physical connector segment on the map layout, then re-compute the path to see Dijkstra dodge the blocked road!</li>
+                        <li>Try out the Emergency buttons to locate closest infrastructure nodes relative to the source.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="bg-slate-950 px-6 py-4 border-t border-slate-800 flex justify-end">
+                <button onclick="toggleSetupModal(false)" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-2 px-5 rounded-xl transition-colors">
+                    Close Guide
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- =========================================================================
+         ===================== DATA STRUCTURES & LOGIC JAVASCRIPT ================
+         ========================================================================= -->
+    <script>
+        // ===================================================================
+        // 1. CUSTOM HASH MAP (Simulating Hash Buckets with Modulo & Collisions)
+        // ===================================================================
+        class CampusHashMap {
+            constructor(bucketSize = 8) {
+                this.bucketSize = bucketSize;
+                this.buckets = Array(bucketSize).fill(null).map(() => []);
+            }
+
+            // Simple hash function using character values modulo size
+            _hash(key) {
+                let hashValue = 0;
+                for (let i = 0; i < key.length; i++) {
+                    hashValue += key.charCodeAt(i) * (i + 1);
+                }
+                return hashValue % this.bucketSize;
+            }
+
+            // Set dynamic value inside map buckets
+            set(key, value) {
+                const index = this._hash(key);
+                const bucket = this.buckets[index];
+                
+                // If key exists, overwrite value
+                for (let i = 0; i < bucket.length; i++) {
+                    if (bucket[i].key === key) {
+                        bucket[i].value = value;
+                        return;
+                    }
+                }
+                // Append key pair to chain (Chaining resolution)
+                bucket.push({ key, value });
+            }
+
+            // Get key value
+            get(key) {
+                const index = this._hash(key);
+                const bucket = this.buckets[index];
+                for (let i = 0; i < bucket.length; i++) {
+                    if (bucket[i].key === key) {
+                        return bucket[i].value;
+                    }
+                }
+                return undefined;
+            }
+
+            // Delete item
+            delete(key) {
+                const index = this._hash(key);
+                const bucket = this.buckets[index];
+                for (let i = 0; i < bucket.length; i++) {
+                    if (bucket[i].key === key) {
+                        bucket.splice(i, 1);
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            // Output all stored values
+            values() {
+                const results = [];
+                for (let i = 0; i < this.bucketSize; i++) {
+                    for (let j = 0; j < this.buckets[i].length; j++) {
+                        results.push(this.buckets[i][j].value);
+                    }
+                }
+                return results;
+            }
+
+            // Get standard keys mapping
+            keys() {
+                const results = [];
+                for (let i = 0; i < this.bucketSize; i++) {
+                    for (let j = 0; j < this.buckets[i].length; j++) {
+                        results.push(this.buckets[i][j].key);
+                    }
+                }
+                return results;
+            }
+        }
+
+
+        // ===================================================================
+        // 2. BINARY MIN-HEAP PRIORITY QUEUE (Used in Dijkstra)
+        // ===================================================================
+        class MinHeap {
+            constructor() {
+                this.heap = [];
+            }
+
+            // Helper index mappings
+            getParentIndex(index) { return Math.floor((index - 1) / 2); }
+            getLeftChildIndex(index) { return 2 * index + 1; }
+            getRightChildIndex(index) { return 2 * index + 2; }
+
+            // Insert new value inside heap
+            insert(nodeId, distance) {
+                const element = { nodeId, distance };
+                this.heap.push(element);
+                this.bubbleUp(this.heap.length - 1);
+            }
+
+            // Remove and return min element
+            extractMin() {
+                if (this.heap.length === 0) return null;
+                if (this.heap.length === 1) return this.heap.pop();
+
+                const min = this.heap[0];
+                this.heap[0] = this.heap.pop();
+                this.bubbleDown(0);
+                return min;
+            }
+
+            // Bubble up elements to restore min-heap properties
+            bubbleUp(index) {
+                while (index > 0) {
+                    const parentIdx = this.getParentIndex(index);
+                    if (this.heap[index].distance >= this.heap[parentIdx].distance) break;
+                    
+                    // Swap elements
+                    this.swap(index, parentIdx);
+                    index = parentIdx;
+                }
+            }
+
+            // Bubble down elements to restore balance
+            bubbleDown(index) {
+                let smallest = index;
+                const length = this.heap.length;
+                const leftIdx = this.getLeftChildIndex(index);
+                const rightIdx = this.getRightChildIndex(index);
+
+                if (leftIdx < length && this.heap[leftIdx].distance < this.heap[smallest].distance) {
+                    smallest = leftIdx;
+                }
+                if (rightIdx < length && this.heap[rightIdx].distance < this.heap[smallest].distance) {
+                    smallest = rightIdx;
+                }
+
+                if (smallest !== index) {
+                    this.swap(index, smallest);
+                    this.bubbleDown(smallest);
+                }
+            }
+
+            swap(i, j) {
+                const temp = this.heap[i];
+                this.heap[i] = this.heap[j];
+                this.heap[j] = temp;
+            }
+
+            isEmpty() {
+                return this.heap.length === 0;
+            }
+
+            size() {
+                return this.heap.length;
+            }
+        }
+
+
+        // ===================================================================
+        // 3. GRAPH REPRESENTATION (Weighted Adjacency List)
+        // ===================================================================
+        class CampusGraph {
+            constructor() {
+                this.nodes = new CampusHashMap(8); // Custom Map: nodeId -> Node Object
+                this.adjacencyList = new Map();   // Map: nodeId -> Array of Edges [{toId, weight, blocked}]
+            }
+
+            addNode(id, name, type, x, y) {
+                this.nodes.set(id, { id, name, type, x, y });
+                if (!this.adjacencyList.has(id)) {
+                    this.adjacencyList.set(id, []);
+                }
+            }
+
+            addEdge(fromId, toId, weight) {
+                // Ensure nodes exist
+                if (!this.adjacencyList.has(fromId) || !this.adjacencyList.has(toId)) return;
+
+                // Add bidirectionally (undirected roads)
+                this.adjacencyList.get(fromId).push({ to: toId, weight: weight, blocked: false });
+                this.adjacencyList.get(toId).push({ to: fromId, weight: weight, blocked: false });
+            }
+
+            // Set block state
+            setBlockRoadState(fromId, toId, isBlocked) {
+                const edgesFrom = this.adjacencyList.get(fromId) || [];
+                edgesFrom.forEach(edge => {
+                    if (edge.to === toId) edge.blocked = isBlocked;
+                });
+
+                const edgesTo = this.adjacencyList.get(toId) || [];
+                edgesTo.forEach(edge => {
+                    if (edge.to === fromId) edge.blocked = isBlocked;
+                });
+            }
+
+            // Get raw neighbor items that aren't blocked
+            getNeighbors(nodeId) {
+                return (this.adjacencyList.get(nodeId) || []).filter(e => !e.blocked);
+            }
+
+            // Find specific edges easily
+            getEdge(u, v) {
+                const edges = this.adjacencyList.get(u) || [];
+                return edges.find(edge => edge.to === v) || null;
+            }
+        }
+
+
+        // ===================================================================
+        // 4. LIFO NAVIGATION HISTORY STACK
+        // ===================================================================
+        class NavigationStack {
+            constructor() {
+                this.frames = [];
+            }
+
+            push(sourceName, destName, routePath, totalDistance) {
+                this.frames.push({
+                    timestamp: new Date().toLocaleTimeString(),
+                    source: sourceName,
+                    dest: destName,
+                    path: routePath,
+                    distance: totalDistance
+                });
+                renderStackUI();
+            }
+
+            pop() {
+                if (this.frames.length === 0) return null;
+                const item = this.frames.pop();
+                renderStackUI();
+                return item;
+            }
+
+            peek() {
+                return this.frames[this.frames.length - 1] || null;
+            }
+
+            isEmpty() {
+                return this.frames.length === 0;
+            }
+
+            clear() {
+                this.frames = [];
+                renderStackUI();
+            }
+        }
+
+
+        // ===================================================================
+        // 5. FIFO PENDING TRANSIT REQUESTS QUEUE
+        // ===================================================================
+        class RequestQueue {
+            constructor() {
+                this.elements = [];
+            }
+
+            enqueue(sourceName, destName, type = 'Normal') {
+                this.elements.push({
+                    id: Math.floor(Math.random() * 9000 + 1000),
+                    source: sourceName,
+                    dest: destName,
+                    type: type, // Normal, Security, Emergency
+                    timestamp: new Date().toLocaleTimeString()
+                });
+                renderQueueUI();
+            }
+
+            dequeue() {
+                if (this.elements.length === 0) return null;
+                const processed = this.elements.shift();
+                renderQueueUI();
+                return processed;
+            }
+
+            isEmpty() {
+                return this.elements.length === 0;
+            }
+
+            size() {
+                return this.elements.length;
+            }
+
+            clear() {
+                this.elements = [];
+                renderQueueUI();
+            }
+        }
+
+
+        // =========================================================================
+        // =================== SYSTEM GLOBAL STATE & GRAPH SETUP ==================
+        // =========================================================================
+        const graph = new CampusGraph();
+        const searchHistory = new NavigationStack();
+        const requestQueue = new RequestQueue();
+
+        // Populate sample coordinates & realistic nodes
+        // Standard coordinates scaled correctly for drawing canvas context.
+        graph.addNode("hostel", "Hostel Blocks", "hostel", 180, 160);
+        graph.addNode("library", "Central Library", "academic", 320, 100);
+        graph.addNode("academic", "Academic Complex", "academic", 480, 140);
+        graph.addNode("canteen", "Main Cafeteria", "amenity", 180, 320);
+        graph.addNode("medical", "Health Center", "medical", 580, 260);
+        graph.addNode("sports", "Sports Arena", "sports", 360, 420);
+        graph.addNode("auditorium", "Silver Jubilee Hall", "academic", 620, 100);
+        graph.addNode("security", "Central Security Office", "security", 520, 420);
+        graph.addNode("gate", "Main Campus Gate", "gate", 680, 340);
+        graph.addNode("admin", "Admin Block", "academic", 360, 240);
+        graph.addNode("science", "Science Research Hub", "academic", 460, 50);
+
+        // Populate sample undirected roads with real-world distance estimates
+        graph.addEdge("hostel", "library", 100);
+        graph.addEdge("hostel", "canteen", 150);
+        graph.addEdge("library", "academic", 80);
+        graph.addEdge("academic", "auditorium", 120);
+        graph.addEdge("canteen", "sports", 200);
+        graph.addEdge("sports", "gate", 250);
+        graph.addEdge("medical", "academic", 90);
+        graph.addEdge("security", "gate", 70);
+        
+        // Extra links to add routing variety
+        graph.addEdge("hostel", "medical", 110);
+        graph.addEdge("academic", "science", 50);
+        graph.addEdge("science", "library", 70);
+        graph.addEdge("canteen", "admin", 130);
+        graph.addEdge("admin", "security", 110);
+        graph.addEdge("auditorium", "admin", 90);
+        graph.addEdge("sports", "medical", 180);
+        graph.addEdge("admin", "academic", 60);
+
+        // Application Global UI & Visualization variables
+        let selectedSource = "gate";
+        let selectedDest = "hostel";
+        let activeRoutePath = null; // Stored computed path of node keys
+        let activeObstructionsList = []; // Edge list currently blocked
+        let draggedNode = null;
+        let scaleFactor = 1.0;
+        let panOffsetX = 0;
+        let panOffsetY = 0;
+        let isPanning = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+        let activeTab = 'graph';
+        let highlightedNodeId = null;
+
+        // Visual Walkthrough execution properties
+        let dijkstraWalkthroughSteps = [];
+        let walkthroughTimer = null;
+        let isWalkthroughRunning = false;
+
+        // Canvas element setup
+        const canvas = document.getElementById('campus-canvas');
+        const ctx = canvas.getContext('2d');
+
+
+        // =========================================================================
+        // ================== DIJKSTRA SHORTEST PATH LOGIC ========================
+        // =========================================================================
+
+        /**
+         * Standard Dijkstra shortest path algorithm returning the path and properties.
+         * Runs in O(E log V) time complexity using our Custom MinHeap and HashMap.
+         */
+        function computeDijkstra(startId, targetId) {
+            const distances = {};
+            const previous = {};
+            const minHeap = new MinHeap();
+            const nodesList = graph.nodes.keys();
+
+            // Set infinite distance bounds as initialization
+            nodesList.forEach(id => {
+                distances[id] = Infinity;
+                previous[id] = null;
+            });
+
+            distances[startId] = 0;
+            minHeap.insert(startId, 0);
+
+            while (!minHeap.isEmpty()) {
+                const { nodeId, distance } = minHeap.extractMin();
+
+                // If target reached, backtrack and output path immediately
+                if (nodeId === targetId) break;
+
+                // Skip processing if a better distance exists
+                if (distance > distances[nodeId]) continue;
+
+                const neighbors = graph.getNeighbors(nodeId);
+                for (let i = 0; i < neighbors.length; i++) {
+                    const edge = neighbors[i];
+                    const altDist = distances[nodeId] + edge.weight;
+
+                    if (altDist < distances[edge.to]) {
+                        distances[edge.to] = altDist;
+                        previous[edge.to] = nodeId;
+                        minHeap.insert(edge.to, altDist);
+                    }
+                }
+            }
+
+            // Reconstruct path
+            const path = [];
+            let current = targetId;
+            while (current !== null) {
+                path.unshift(current);
+                current = previous[current];
+            }
+
+            return {
+                path: path[0] === startId ? path : [],
+                distance: distances[targetId] === Infinity ? -1 : distances[targetId]
+            };
+        }
+
+
+        /**
+         * Walkthrough-enabled Dijkstra Shortest Path Engine.
+         * Records intermediate priority queue, distance relaxation, and traversal stages
+         * to power the "Walkthrough Step-by-Step" UI animation.
+         */
+        function buildDijkstraVisualSteps(startId, targetId) {
+            const steps = [];
+            const distances = {};
+            const previous = {};
+            const minHeap = new MinHeap();
+            const nodesList = graph.nodes.keys();
+
+            nodesList.forEach(id => {
+                distances[id] = Infinity;
+                previous[id] = null;
+            });
+
+            distances[startId] = 0;
+            minHeap.insert(startId, 0);
+
+            // Log initialization frame
+            steps.push({
+                type: 'INIT',
+                nodeId: startId,
+                heapState: [...minHeap.heap],
+                distances: { ...distances },
+                highlightPath: []
+            });
+
+            while (!minHeap.isEmpty()) {
+                // Peek and pop state
+                const currentMin = minHeap.heap[0];
+                const { nodeId, distance } = minHeap.extractMin();
+
+                steps.push({
+                    type: 'EXTRACT',
+                    nodeId: nodeId,
+                    heapState: [...minHeap.heap],
+                    distances: { ...distances },
+                    highlightPath: reconstructStepPath(previous, nodeId, startId),
+                    message: `Extracted ${graph.nodes.get(nodeId).name} with path weight of ${distance}m`
+                });
+
+                if (nodeId === targetId) {
+                    steps.push({
+                        type: 'TARGET_REACHED',
+                        nodeId: nodeId,
+                        heapState: [...minHeap.heap],
+                        distances: { ...distances },
+                        highlightPath: reconstructStepPath(previous, nodeId, startId),
+                        message: `Destination ${graph.nodes.get(nodeId).name} reached! Finalizing path structure.`
+                    });
+                    break;
+                }
+
+                if (distance > distances[nodeId]) continue;
+
+                const neighbors = graph.getNeighbors(nodeId);
+                for (let i = 0; i < neighbors.length; i++) {
+                    const edge = neighbors[i];
+                    const altDist = distances[nodeId] + edge.weight;
+                    let isRelaxed = false;
+
+                    if (altDist < distances[edge.to]) {
+                        distances[edge.to] = altDist;
+                        previous[edge.to] = nodeId;
+                        minHeap.insert(edge.to, altDist);
+                        isRelaxed = true;
+                    }
+
+                    steps.push({
+                        type: 'RELAX',
+                        nodeId: nodeId,
+                        neighborId: edge.to,
+                        heapState: [...minHeap.heap],
+                        distances: { ...distances },
+                        isRelaxed: isRelaxed,
+                        highlightPath: reconstructStepPath(previous, nodeId, startId),
+                        message: isRelaxed 
+                            ? `Relaxed edge to ${graph.nodes.get(edge.to).name}: Updated distance to ${altDist}m`
+                            : `Checked edge to ${graph.nodes.get(edge.to).name}: Current weight ${distances[edge.to]}m is shorter than ${altDist}m`
+                    });
+                }
+            }
+
+            return steps;
+        }
+
+        function reconstructStepPath(prevMap, current, start) {
+            const temp = [];
+            let curr = current;
+            while (curr !== null) {
+                temp.unshift(curr);
+                curr = prevMap[curr];
+            }
+            return temp;
+        }
+
+
+        // =========================================================================
+        // ================== USER INTERACTIVE OPERATIONS ==========================
+        // =========================================================================
+
+        // Trigger Standard Direct Routing Find
+        function executePathfind() {
+            // Cancel active simulation playbacks
+            cancelActiveWalkthrough();
+
+            const src = document.getElementById('path-source').value;
+            const dest = document.getElementById('path-dest').value;
+
+            if (src === dest) {
+                showCustomAlert("Destination Collision", "Source and target destinations match! Check your inputs and try again.", "warning");
+                return;
+            }
+
+            const result = computeDijkstra(src, dest);
+            
+            if (result.distance === -1) {
+                activeRoutePath = null;
+                updateOutputBanner("Routing Error", "No clear path available! Remove campus roadblocks to clear transit links.", "rose", result);
+                showCustomAlert("System Alert", "Transit blockages are preventing connections between selected points.", "warning");
+                drawCampusGraph();
+                return;
+            }
+
+            activeRoutePath = result.path;
+            const srcName = graph.nodes.get(src).name;
+            const destName = graph.nodes.get(dest).name;
+
+            // Push execution logs to history Stack
+            searchHistory.push(srcName, destName, result.path, result.distance);
+
+            // Update user notifications
+            updateOutputBanner("Computation Success", `Calculated route from ${srcName} to ${destName}.`, "emerald", result);
+            drawCampusGraph();
+        }
+
+        // Trigger step-by-step visual debugging system
+        function executePathfindVisualWalkthrough() {
+            cancelActiveWalkthrough();
+            
+            const src = document.getElementById('path-source').value;
+            const dest = document.getElementById('path-dest').value;
+
+            if (src === dest) {
+                showCustomAlert("Destination Collision", "Select different locations to start the visualizer.", "warning");
+                return;
+            }
+
+            // Open Min-Heap state panel dynamically
+            document.getElementById('heap-debugger-panel').classList.remove('hidden');
+
+            dijkstraWalkthroughSteps = buildDijkstraVisualSteps(src, dest);
+            isWalkthroughRunning = true;
+            let currentStepIdx = 0;
+
+            showCustomAlert("Visualizer Initiated", "Trace Dijkstra optimization logs below the Canvas panel.", "info");
+
+            function playNextStep() {
+                if (currentStepIdx >= dijkstraWalkthroughSteps.length) {
+                    cancelActiveWalkthrough();
+                    // Conclude and fire standard route finder callback to clean up view
+                    executePathfind();
+                    return;
+                }
+
+                const step = dijkstraWalkthroughSteps[currentStepIdx];
+                renderWalkthroughStepUI(step);
+                currentStepIdx++;
+                walkthroughTimer = setTimeout(playNextStep, 1500); // Step speed 1.5 seconds
+            }
+
+            playNextStep();
+        }
+
+        function cancelActiveWalkthrough() {
+            if (walkthroughTimer) {
+                clearTimeout(walkthroughTimer);
+                walkthroughTimer = null;
+            }
+            isWalkthroughRunning = false;
+        }
+
+        // Emergency quick routing calculation
+        function triggerEmergency(targetType) {
+            cancelActiveWalkthrough();
+            const sourceId = document.getElementById('path-source').value;
+            const sourceName = graph.nodes.get(sourceId).name;
+            
+            // Gather matching locations
+            const candidateNodes = graph.nodes.values().filter(n => {
+                if (targetType === 'medical') return n.type === 'medical';
+                if (targetType === 'security') return n.type === 'security';
+                if (targetType === 'gate') return n.type === 'gate';
+                return false;
+            });
+
+            if (candidateNodes.length === 0) {
+                showCustomAlert("Emergency Error", "No physical centers match criteria.", "danger");
+                return;
+            }
+
+            // Calculate paths to all matching items; pick the shortest distance
+            let optimalRoute = null;
+            let minDistance = Infinity;
+            let targetLabel = "";
+
+            candidateNodes.forEach(node => {
+                const res = computeDijkstra(sourceId, node.id);
+                if (res.distance !== -1 && res.distance < minDistance) {
+                    minDistance = res.distance;
+                    optimalRoute = res.path;
+                    targetLabel = node.name;
+                }
+            });
+
+            if (!optimalRoute) {
+                showCustomAlert("Route Obstruction", `All corridors to ${targetType} facilities are blocked.`, "danger");
+                return;
+            }
+
+            activeRoutePath = optimalRoute;
+            document.getElementById('path-dest').value = optimalRoute[optimalRoute.length - 1];
+            
+            // Log to historical trace LIFO Stack
+            searchHistory.push(sourceName, `[EMERGENCY] ${targetLabel}`, optimalRoute, minDistance);
+            
+            updateOutputBanner("EMERGENCY DISPATCH", `Determined route to the nearest facility: ${targetLabel}.`, "rose", {
+                path: optimalRoute,
+                distance: minDistance
+            });
+            drawCampusGraph();
+            showCustomAlert("Critical Route Calculated", `Redirecting toward safest access point: ${targetLabel}.`, "danger");
+        }
+
+
+        // =========================================================================
+        // ================= WORKPLACE REQUEST QUEUE MANAGEMENT ====================
+        // =========================================================================
+        const mockDestinations = [
+            { s: "hostel", d: "library", t: "Normal" },
+            { s: "canteen", d: "sports", t: "Normal" },
+            { s: "gate", d: "security", t: "Security" },
+            { s: "medical", d: "hostel", t: "Emergency" },
+            { s: "sports", d: "academic", t: "Normal" },
+            { s: "academic", d: "auditorium", t: "Normal" }
+        ];
+
+        function enqueueMockRequest() {
+            const randomPick = mockDestinations[Math.floor(Math.random() * mockDestinations.length)];
+            const srcName = graph.nodes.get(randomPick.s).name;
+            const destName = graph.nodes.get(randomPick.d).name;
+            requestQueue.enqueue(srcName, destName, randomPick.t);
+            showCustomAlert("Request Buffered", "New transit trace request appended to dispatcher queue.", "info");
+        }
+
+        function dequeueRequest() {
+            if (requestQueue.isEmpty()) {
+                showCustomAlert("Queue Idle", "No pending routing requests in dispatcher queue.", "info");
+                return;
+            }
+
+            const request = requestQueue.dequeue();
+            
+            // Find keys associated with label names
+            const allNodes = graph.nodes.values();
+            const srcNode = allNodes.find(n => n.name === request.source);
+            const destNode = allNodes.find(n => n.name === request.dest);
+
+            if (srcNode && destNode) {
+                document.getElementById('path-source').value = srcNode.id;
+                document.getElementById('path-dest').value = destNode.id;
+                executePathfind();
+                showCustomAlert("Processing Frame", `Dispatcher routing active for request ID: #${request.id}`, "success");
+            }
+        }
+
+
+        // =========================================================================
+        // ==================== RENDERING & VIEWPORT DRAW LOGIC ====================
+        // =========================================================================
+        
+        function updateOutputBanner(statusPre, statusMessage, colorTheme, results = {}) {
+            const container = document.getElementById('output-banner');
+            const preEl = document.getElementById('output-banner-pre');
+            const msgEl = document.getElementById('output-banner-msg');
+            const dataEl = document.getElementById('output-banner-data');
+            const iconWrap = document.getElementById('output-banner-icon');
+
+            preEl.textContent = statusPre;
+            msgEl.textContent = statusMessage;
+
+            if (colorTheme === 'rose') {
+                container.className = "bg-rose-950/20 border-t border-rose-900/50 px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0";
+                iconWrap.className = "p-2 rounded-lg bg-rose-950/80 border border-rose-900 text-rose-400";
+                iconWrap.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-lg animate-pulse"></i>';
+            } else if (colorTheme === 'emerald') {
+                container.className = "bg-emerald-950/10 border-t border-emerald-900/30 px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0";
+                iconWrap.className = "p-2 rounded-lg bg-emerald-950/50 border border-emerald-900 text-emerald-400";
+                iconWrap.innerHTML = '<i class="fa-solid fa-square-check text-lg"></i>';
+            } else {
+                container.className = "bg-slate-900 border-t border-slate-800 px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0";
+                iconWrap.className = "p-2 rounded-lg bg-slate-950 border border-slate-800 text-indigo-400";
+                iconWrap.innerHTML = '<i class="fa-solid fa-compass text-lg"></i>';
+            }
+
+            if (results.distance !== undefined && results.distance !== -1) {
+                dataEl.innerHTML = `
+                    <div class="bg-slate-950/80 border border-slate-800 px-3 py-1.5 rounded-xl text-center">
+                        <span class="text-[9px] text-slate-500 uppercase tracking-widest block font-bold">Total Path Distance</span>
+                        <span class="text-sm font-bold text-amber-400 font-mono">${results.distance} meters</span>
+                    </div>
+                    <div class="bg-slate-950/80 border border-slate-800 px-3 py-1.5 rounded-xl text-center">
+                        <span class="text-[9px] text-slate-500 uppercase tracking-widest block font-bold">Hop Count</span>
+                        <span class="text-sm font-bold text-emerald-400 font-mono">${results.path ? results.path.length - 1 : 0} steps</span>
+                    </div>
+                `;
+            } else {
+                dataEl.innerHTML = '';
+            }
+        }
+
+        // Initialize Canvas Sizing
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            drawCampusGraph();
+        }
+
+        // Render Graph Nodes & Active Routes
+        function drawCampusGraph() {
+            if (!canvas.width) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            
+            // Apply zoom/pan scale transformations
+            ctx.translate(panOffsetX, panOffsetY);
+            ctx.scale(scaleFactor, scaleFactor);
+
+            // GATHER ROADS/EDGES FOR RENDERING
+            const nodesList = graph.nodes.values();
+            const renderedEdges = new Set();
+
+            nodesList.forEach(u => {
+                const edges = graph.adjacencyList.get(u.id) || [];
+                edges.forEach(edge => {
+                    const v = graph.nodes.get(edge.to);
+                    if (!v) return;
+
+                    // Standardize lookup to prevent duplicate lines
+                    const edgeHash = [u.id, v.id].sort().join('-');
+                    if (renderedEdges.has(edgeHash)) return;
+                    renderedEdges.add(edgeHash);
+
+                    // Check if edge is active on computed route path
+                    let isHighlighted = false;
+                    if (activeRoutePath && activeRoutePath.length > 1) {
+                        for (let i = 0; i < activeRoutePath.length - 1; i++) {
+                            if ((activeRoutePath[i] === u.id && activeRoutePath[i+1] === v.id) ||
+                                (activeRoutePath[i] === v.id && activeRoutePath[i+1] === u.id)) {
+                                isHighlighted = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Compute rendering weights & style attributes
+                    ctx.beginPath();
+                    ctx.moveTo(u.x, u.y);
+                    ctx.lineTo(v.x, v.y);
+
+                    if (edge.blocked) {
+                        ctx.strokeStyle = '#ef4444'; // Red for obstructions
+                        ctx.lineWidth = 3.5;
+                        ctx.setLineDash([6, 4]); // Dotted lines for blocks
+                    } else if (isHighlighted) {
+                        ctx.strokeStyle = '#f43f5e'; // Glowing Rose for paths
+                        ctx.lineWidth = 5.5;
+                        ctx.setLineDash([]);
+                        ctx.shadowColor = '#f43f5e';
+                        ctx.shadowBlur = 10;
+                    } else {
+                        ctx.strokeStyle = '#334155'; // Secondary slate connectors
+                        ctx.lineWidth = 2.5;
+                        ctx.setLineDash([]);
+                        ctx.shadowBlur = 0;
+                    }
+
+                    ctx.stroke();
+                    ctx.setLineDash([]); // Reset dashed states
+                    ctx.shadowBlur = 0;   // Reset glowing states
+
+                    // Draw Edge Distance Badges
+                    const midX = (u.x + v.x) / 2;
+                    const midY = (u.y + v.y) / 2;
+
+                    ctx.beginPath();
+                    ctx.arc(midX, midY, 11, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#0f172a';
+                    ctx.strokeStyle = edge.blocked ? '#ef4444' : isHighlighted ? '#f43f5e' : '#1e293b';
+                    ctx.lineWidth = 1.5;
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.fillStyle = edge.blocked ? '#ef4444' : isHighlighted ? '#fda4af' : '#94a3b8';
+                    ctx.font = 'bold 9px "JetBrains Mono"';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(`${edge.weight}m`, midX, midY + 0.5);
+                });
+            });
+
+            // RENDER INTERACTIVE NODES
+            nodesList.forEach(node => {
+                const isSelectedSrc = node.id === document.getElementById('path-source').value;
+                const isSelectedDst = node.id === document.getElementById('path-dest').value;
+                const isHighlighted = activeRoutePath && activeRoutePath.includes(node.id);
+
+                // Compute node type design styles
+                let fillStyle = '#1e293b';
+                let borderStyle = '#475569';
+                let iconClass = 'fa-solid fa-circle';
+
+                if (node.type === 'medical') {
+                    fillStyle = '#450a0a';
+                    borderStyle = '#ef4444';
+                    iconClass = '\uf486'; // Cross
+                } else if (node.type === 'security') {
+                    fillStyle = '#451a03';
+                    borderStyle = '#f59e0b';
+                    iconClass = '\uf3ed'; // Badge
+                } else if (node.type === 'gate') {
+                    fillStyle = '#064e3b';
+                    borderStyle = '#10b981';
+                    iconClass = '\uf52b'; // Door open
+                } else if (isSelectedSrc) {
+                    fillStyle = '#1e1b4b';
+                    borderStyle = '#6366f1';
+                } else if (isSelectedDst) {
+                    fillStyle = '#31102f';
+                    borderStyle = '#ec4899';
+                }
+
+                // Drawing outermost interactive ring
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 16, 0, 2 * Math.PI);
+                ctx.fillStyle = fillStyle;
+                ctx.strokeStyle = borderStyle;
+                ctx.lineWidth = 2.5;
+
+                if (isSelectedSrc || isSelectedDst) {
+                    ctx.shadowColor = borderStyle;
+                    ctx.shadowBlur = 12;
+                    ctx.lineWidth = 4.0;
+                }
+
+                ctx.fill();
+                ctx.stroke();
+                ctx.shadowBlur = 0; // Reset
+
+                // Render inner custom design icons
+                ctx.fillStyle = borderStyle;
+                ctx.font = '900 12px "Font Awesome 6 Free"';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                let renderChar = '\uf25a'; // Hand point icon mapping
+                if (node.type === 'medical') renderChar = '\uf486';
+                else if (node.type === 'security') renderChar = '\uf3ed';
+                else if (node.type === 'gate') renderChar = '\uf52b';
+                else if (node.type === 'sports') renderChar = '\uf1e3';
+                else if (node.id === 'canteen') renderChar = '\uf2e7';
+                else if (node.id === 'library') renderChar = '\uf518';
+                else if (node.id === 'hostel') renderChar = '\uf015';
+
+                ctx.fillText(renderChar, node.x, node.y);
+
+                // Render Location Label strings below coordinates
+                ctx.font = 'bold 10px "Inter"';
+                ctx.fillStyle = '#f1f5f9';
+                ctx.textAlign = 'center';
+                
+                // Drop shadows below labels for excellent readability
+                ctx.shadowColor = '#000000';
+                ctx.shadowBlur = 4;
+                ctx.fillText(node.name, node.x, node.y + 28);
+                ctx.shadowBlur = 0; // Reset
+
+                // Draw secondary selection ring
+                if (isSelectedSrc) {
+                    drawLabelIndicator(node.x, node.y - 25, 'START', '#10b981');
+                } else if (isSelectedDst) {
+                    drawLabelIndicator(node.x, node.y - 25, 'DEST', '#ec4899');
+                }
+            });
+
+            ctx.restore();
+        }
+
+        function drawLabelIndicator(x, y, text, color) {
+            ctx.fillStyle = color;
+            ctx.font = 'extrabold 8px "Inter"';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Background capsule
+            const metrics = ctx.measureText(text);
+            const w = metrics.width + 8;
+            const h = 13;
+
+            ctx.beginPath();
+            ctx.roundRect(x - w / 2, y - h / 2, w, h, 3);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(text, x, y);
+        }
+
+        function resetCampusMapPosition() {
+            scaleFactor = 1.0;
+            panOffsetX = 0;
+            panOffsetY = 0;
+            drawCampusGraph();
+        }
+
+
+        // =========================================================================
+        // ================== CANVAS EVENT HOOKS & DRAG-AND-DROP ===================
+        // =========================================================================
+        
+        function getTransformedMouseCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const rawX = e.clientX - rect.left;
+            const rawY = e.clientY - rect.top;
+
+            // De-calculate offset transforms to find actual node coordinates
+            const x = (rawX - panOffsetX) / scaleFactor;
+            const y = (rawY - panOffsetY) / scaleFactor;
+            return { x, y };
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            const coords = getTransformedMouseCoords(e);
+            
+            // Check if user clicked/hovered on a Node item
+            const clickedNode = graph.nodes.values().find(node => {
+                const dx = node.x - coords.x;
+                const dy = node.y - coords.y;
+                return Math.sqrt(dx*dx + dy*dy) < 18;
+            });
+
+            if (clickedNode) {
+                draggedNode = clickedNode;
+                return;
+            }
+
+            // Clicked road edge logic (toggling blocking status)
+            let clickedEdge = null;
+            const nodesList = graph.nodes.values();
+            const evaluatedPairs = new Set();
+
+            for (let i = 0; i < nodesList.length; i++) {
+                const u = nodesList[i];
+                const edges = graph.adjacencyList.get(u.id) || [];
+                for (let j = 0; j < edges.length; j++) {
+                    const edge = edges[j];
+                    const v = graph.nodes.get(edge.to);
+                    if (!v) continue;
+
+                    const edgeHash = [u.id, v.id].sort().join('-');
+                    if (evaluatedPairs.has(edgeHash)) continue;
+                    evaluatedPairs.add(edgeHash);
+
+                    // Compute perpendicular distance from mouse click coordinate to segment line
+                    const distToSegment = getDistanceToLineSegment(coords.x, coords.y, u.x, u.y, v.x, v.y);
+                    if (distToSegment < 8) {
+                        clickedEdge = { from: u.id, to: v.id, edge: edge };
+                        break;
+                    }
+                }
+                if (clickedEdge) break;
+            }
+
+            if (clickedEdge) {
+                const nextState = !clickedEdge.edge.blocked;
+                graph.setBlockRoadState(clickedEdge.from, clickedEdge.to, nextState);
+                
+                // Show alerts
+                const label = `${graph.nodes.get(clickedEdge.from).name} ↔ ${graph.nodes.get(clickedEdge.to).name}`;
+                if (nextState) {
+                    showCustomAlert("Road Obstructed", `Set blockage active along corridor: ${label}`, "danger");
+                } else {
+                    showCustomAlert("Road Cleared", `Construction cleared: corridor open.`, "success");
+                }
+                
+                rebuildBlockingModuleUI();
+                executePathfind();
+                return;
+            }
+
+            // Fallback: Start canvas pan viewport move
+            isPanning = true;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (draggedNode) {
+                const coords = getTransformedMouseCoords(e);
+                draggedNode.x = Math.round(coords.x);
+                draggedNode.y = Math.round(coords.y);
+                drawCampusGraph();
+                return;
+            }
+
+            if (isPanning) {
+                const dx = e.clientX - lastMouseX;
+                const dy = e.clientY - lastMouseY;
+                panOffsetX += dx;
+                panOffsetY += dy;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+                drawCampusGraph();
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            draggedNode = null;
+            isPanning = false;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            draggedNode = null;
+            isPanning = false;
+        });
+
+        // Wheel zoom controls
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const scaleAmount = -e.deltaY * 0.001;
+            scaleFactor = Math.min(Math.max(0.4, scaleFactor + scaleAmount), 3.0);
+            drawCampusGraph();
+        }, { passive: false });
+
+        // Helper: Perpendicular point-line distance formula
+        function getDistanceToLineSegment(px, py, x1, y1, x2, y2) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const l2 = dx*dx + dy*dy;
+            if (l2 === 0) return Math.sqrt((px-x1)*(px-x1) + (py-y1)*(py-y1));
+            
+            let t = ((px - x1) * dx + (py - y1) * dy) / l2;
+            t = Math.max(0, Math.min(1, t));
+            
+            const projectionX = x1 + t * dx;
+            const projectionY = y1 + t * dy;
+            return Math.sqrt((px - projectionX)*(px - projectionX) + (py - projectionY)*(py - projectionY));
+        }
+
+
+        // =========================================================================
+        // ==================== DYNAMIC DATA STRUCTURE UI WORKFLOW =================
+        // =========================================================================
+        
+        // 1. Populate Dropdowns Mapping HashMap nodes
+        function populateNodeSelectors() {
+            const selectSrc = document.getElementById('path-source');
+            const selectDest = document.getElementById('path-dest');
+            
+            selectSrc.innerHTML = '';
+            selectDest.innerHTML = '';
+
+            const list = graph.nodes.values();
+            list.forEach(node => {
+                const opt1 = document.createElement('option');
+                opt1.value = node.id;
+                opt1.textContent = node.name;
+                selectSrc.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = node.id;
+                opt2.textContent = node.name;
+                selectDest.appendChild(opt2);
+            });
+
+            // Set default presets
+            selectSrc.value = "gate";
+            selectDest.value = "hostel";
+        }
+
+        // 2. Tab switcher between Data Structure inspectors
+        function switchTab(tabId) {
+            activeTab = tabId;
+            const tabs = ['graph', 'queue', 'stack'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const panel = document.getElementById(`inspector-${t}`);
+                if (t === tabId) {
+                    el.className = "flex-1 text-center py-1.5 text-[10px] font-bold tracking-wider uppercase rounded-lg transition-all text-white bg-indigo-600 shadow-md shadow-indigo-950/40";
+                    panel.classList.remove('hidden');
+                } else {
+                    el.className = "flex-1 text-center py-1.5 text-[10px] font-bold tracking-wider uppercase rounded-lg transition-all text-slate-400 hover:text-slate-200";
+                    panel.classList.add('hidden');
+                }
+            });
+        }
+
+        // 3. Populate and render active HashMap layout
+        function renderHashMapUI() {
+            const hashBox = document.getElementById('hashmap-viewer-bucket');
+            hashBox.innerHTML = '';
+
+            for (let i = 0; i < graph.nodes.bucketSize; i++) {
+                const bucket = graph.nodes.buckets[i];
+                let contentHTML = '';
+
+                if (bucket.length === 0) {
+                    contentHTML = `<span class="text-slate-600 italic">Empty Bucket</span>`;
+                } else {
+                    contentHTML = bucket.map(item => `
+                        <span class="bg-indigo-950/60 border border-indigo-900 px-1.5 py-0.5 rounded text-[10px] font-semibold text-slate-200 inline-block m-0.5">
+                            "${item.key}" <i class="fa-solid fa-arrow-right text-[8px] text-indigo-400"></i> ${item.value.id}
+                        </span>
+                    `).join('');
+                }
+
+                const line = document.createElement('div');
+                line.className = "flex items-start py-1 border-b border-slate-800 last:border-0 font-mono text-[10px]";
+                line.innerHTML = `
+                    <div class="w-16 shrink-0 text-amber-500 font-bold">Bucket [${i}]</div>
+                    <div class="flex-1">${contentHTML}</div>
+                `;
+                hashBox.appendChild(line);
+            }
+        }
+
+        // 4. Populate Adjacency List visualizer mapping
+        function renderAdjacencyListUI() {
+            const listEl = document.getElementById('adjlist-viewer');
+            listEl.innerHTML = '';
+
+            const keys = graph.nodes.keys();
+            keys.forEach(key => {
+                const neighbors = graph.adjacencyList.get(key) || [];
+                const neighborStrings = neighbors.map(edge => {
+                    const statusClass = edge.blocked ? 'text-red-400 line-through' : 'text-slate-300';
+                    return `<span class="${statusClass}">(${edge.to}, ${edge.weight}m)</span>`;
+                }).join(', ');
+
+                const row = document.createElement('div');
+                row.className = "py-1.5 border-b border-slate-800 last:border-0 leading-normal";
+                row.innerHTML = `
+                    <div class="text-indigo-400 font-bold font-mono">${key}:</div>
+                    <div class="pl-3 text-slate-400 font-mono">[ ${neighborStrings || '<span class="italic text-slate-600">No roads connected</span>'} ]</div>
+                `;
+                listEl.appendChild(row);
+            });
+        }
+
+        // 5. Render History Stack Visualizer Frame (LIFO)
+        function renderStackUI() {
+            const container = document.getElementById('stack-display-container');
+            container.innerHTML = '';
+
+            if (searchHistory.frames.length === 0) {
+                container.innerHTML = `
+                    <div class="py-6 text-center text-xs text-slate-500 italic">
+                        No operations logged in Call-Stack trace.
+                    </div>
+                `;
+                return;
+            }
+
+            // Display top frame down
+            const reversedFrames = [...searchHistory.frames].reverse();
+            reversedFrames.forEach((frame, idx) => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-950 border border-slate-800/80 p-3 rounded-xl hover:border-slate-700 transition-all cursor-pointer relative overflow-hidden group";
+                
+                // Quick reload handler on click
+                card.onclick = () => {
+                    // Try to locate node keys for names
+                    const allNodes = graph.nodes.values();
+                    const srcNode = allNodes.find(n => n.name === frame.source || `[EMERGENCY] ${n.name}` === frame.source);
+                    const destNode = allNodes.find(n => n.name === frame.dest || `[EMERGENCY] ${n.name}` === frame.dest);
+                    if (srcNode && destNode) {
+                        document.getElementById('path-source').value = srcNode.id;
+                        document.getElementById('path-dest').value = destNode.id;
+                        executePathfind();
+                    }
+                };
+
+                const isTopFrame = idx === 0;
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-[9px] font-bold ${isTopFrame ? 'text-rose-400' : 'text-slate-400'} font-mono">${isTopFrame ? 'TOP FRAME' : 'FRAME #' + (reversedFrames.length - idx - 1)}</span>
+                        <span class="text-[9px] text-slate-500 font-mono">${frame.timestamp}</span>
+                    </div>
+                    <div class="text-xs font-semibold text-slate-200 mt-1 flex items-center gap-1.5">
+                        <span>${frame.source}</span>
+                        <i class="fa-solid fa-arrow-right text-[10px] text-slate-500"></i>
+                        <span>${frame.dest}</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-2 pt-1.5 border-t border-slate-800/50 text-[10px] text-slate-400 font-mono">
+                        <span>Distance: <b class="text-amber-500">${frame.distance}m</b></span>
+                        <span class="opacity-0 group-hover:opacity-100 transition-opacity text-indigo-400 font-bold flex items-center gap-0.5">Click to run <i class="fa-solid fa-play text-[8px]"></i></span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 6. Render Pending Transit Dispatcher Queue UI (FIFO)
+        function renderQueueUI() {
+            const container = document.getElementById('queue-display-container');
+            const badge = document.getElementById('queue-length-badge');
+            container.innerHTML = '';
+
+            const size = requestQueue.size();
+            badge.textContent = `${size} active frame${size === 1 ? '' : 's'}`;
+
+            if (size === 0) {
+                container.innerHTML = `
+                    <div class="py-6 text-center text-xs text-slate-500 italic">
+                        Transit dispatcher queue is empty.
+                    </div>
+                `;
+                return;
+            }
+
+            requestQueue.elements.forEach((req, idx) => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-950 border border-slate-800/80 p-3 rounded-xl relative flex items-center gap-3";
+                
+                let typeColor = "bg-slate-800 text-slate-300";
+                if (req.type === 'Emergency') typeColor = "bg-rose-950 text-rose-300 border border-rose-900/60";
+                else if (req.type === 'Security') typeColor = "bg-amber-950 text-amber-300 border border-amber-900/60";
+
+                card.innerHTML = `
+                    <div class="shrink-0 flex flex-col items-center justify-center bg-slate-900 border border-slate-800 px-2 py-1 rounded text-center min-w-[40px]">
+                        <span class="text-[9px] text-slate-500 font-mono font-bold uppercase">${idx === 0 ? 'HEAD' : 'IN-Q'}</span>
+                        <span class="text-[10px] font-bold text-slate-300">#${req.id}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-1.5">
+                            <span class="text-[10px] font-mono font-bold ${typeColor} px-1.5 py-0.2 rounded">${req.type}</span>
+                            <span class="text-[8px] text-slate-500 font-mono">${req.timestamp}</span>
+                        </div>
+                        <div class="text-xs font-semibold text-slate-200 mt-1.5 flex items-center gap-1.5 truncate">
+                            <span>${req.source}</span>
+                            <i class="fa-solid fa-arrow-right text-[10px] text-slate-500"></i>
+                            <span>${req.dest}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Pop last history frame on manual action
+        function popStackHistory() {
+            if (searchHistory.isEmpty()) {
+                showCustomAlert("Stack Empty", "No history frames remaining inside the LIFO container.", "info");
+                return;
+            }
+            const popped = searchHistory.pop();
+            showCustomAlert("Popped Stack Frame", `Discarded recent route history logged: ${popped.source} to ${popped.dest}`, "warning");
+        }
+
+        // 7. Populates roadblocks module inside Sidebar Config
+        function rebuildBlockingModuleUI() {
+            const container = document.getElementById('block-roads-list');
+            container.innerHTML = '';
+
+            const nodesList = graph.nodes.values();
+            const populatedPairs = new Set();
+            let countBlocks = 0;
+
+            for (let i = 0; i < nodesList.length; i++) {
+                const u = nodesList[i];
+                const edges = graph.adjacencyList.get(u.id) || [];
+                for (let j = 0; j < edges.length; j++) {
+                    const edge = edges[j];
+                    const v = graph.nodes.get(edge.to);
+                    if (!v) continue;
+
+                    const hash = [u.id, v.id].sort().join('-');
+                    if (populatedPairs.has(hash)) continue;
+                    populatedPairs.add(hash);
+
+                    if (edge.blocked) countBlocks++;
+
+                    const row = document.createElement('div');
+                    row.className = "flex items-center justify-between p-2 rounded-lg bg-slate-900 border border-slate-800 text-[11px] select-none hover:bg-slate-850 transition-colors";
+                    
+                    const labelId = `block-chk-${hash}`;
+                    row.innerHTML = `
+                        <label for="${labelId}" class="text-slate-300 font-medium cursor-pointer flex-1 py-0.5">${u.name} ↔ ${v.name}</label>
+                        <input type="checkbox" id="${labelId}" class="w-3.5 h-3.5 rounded bg-slate-950 text-rose-500 border-slate-700 focus:ring-0 focus:ring-offset-0 cursor-pointer" ${edge.blocked ? 'checked' : ''}>
+                    `;
+
+                    // Hook click logic
+                    const checkbox = row.querySelector('input');
+                    checkbox.addEventListener('change', (e) => {
+                        const nextState = e.target.checked;
+                        graph.setBlockRoadState(u.id, v.id, nextState);
+                        if (nextState) {
+                            showCustomAlert("Road Obstructed", "Blocked route link successfully.", "danger");
+                        } else {
+                            showCustomAlert("Road Cleared", "Construction block resolved successfully.", "success");
+                        }
+                        rebuildBlockingModuleUI();
+                        executePathfind();
+                    });
+
+                    container.appendChild(row);
+                }
+            }
+
+            document.getElementById('stat-blocks').textContent = countBlocks;
+            renderAdjacencyListUI();
+        }
+
+        // Clear active roadblocks
+        document.getElementById('btn-clear-blocks').addEventListener('click', () => {
+            const list = graph.nodes.values();
+            list.forEach(u => {
+                const edges = graph.adjacencyList.get(u.id) || [];
+                edges.forEach(e => e.blocked = false);
+            });
+            showCustomAlert("Obstructions Cleared", "All campus corridor networks are fully operational.", "success");
+            rebuildBlockingModuleUI();
+            executePathfind();
+        });
+
+
+        // =========================================================================
+        // ============= DIJKSTRA STEP VISUAL WALKTHROUGH RENDERING ================
+        // =========================================================================
+        
+        function renderWalkthroughStepUI(step) {
+            // Update map view highlighted routes dynamically
+            activeRoutePath = step.highlightPath;
+            drawCampusGraph();
+
+            // Populate binary heap structures visually inside debugging container
+            const nodesContainer = document.getElementById('heap-nodes-visualizer');
+            const heapBadge = document.getElementById('heap-size-badge');
+            nodesContainer.innerHTML = '';
+
+            heapBadge.textContent = `size: ${step.heapState.length}`;
+
+            if (step.heapState.length === 0) {
+                nodesContainer.innerHTML = '<span class="text-slate-600 italic">Heap Empty</span>';
+            } else {
+                step.heapState.forEach((item, index) => {
+                    const nodeLabel = graph.nodes.get(item.nodeId).name;
+                    const isRoot = index === 0;
+
+                    const bubble = document.createElement('div');
+                    bubble.className = `p-1.5 px-2.5 rounded-lg text-[10px] font-bold font-mono border flex items-center gap-1.5 ${isRoot ? 'bg-amber-950 border-amber-500 text-amber-300' : 'bg-slate-900 border-slate-800 text-slate-300'}`;
+                    bubble.innerHTML = `
+                        <span class="text-slate-500 font-normal">idx[${index}]</span>
+                        <span class="truncate">${nodeLabel}</span>
+                        <span class="text-amber-500">${item.distance}m</span>
+                    `;
+                    nodesContainer.appendChild(bubble);
+                });
+            }
+
+            // Populate table tracking states of shortest distance arrays
+            const distStateContainer = document.getElementById('dijkstra-state-dist');
+            distStateContainer.innerHTML = '';
+
+            const header = document.createElement('div');
+            header.className = "grid grid-cols-2 text-slate-500 border-b border-slate-800 pb-1 font-bold text-[9px] uppercase tracking-wider";
+            header.innerHTML = `<span>Campus Node</span> <span class="text-right">Shortest Distance</span>`;
+            distStateContainer.appendChild(header);
+
+            Object.keys(step.distances).forEach(key => {
+                const nodeName = graph.nodes.get(key).name;
+                const distVal = step.distances[key];
+                const displayDist = distVal === Infinity ? 'Infinity' : `${distVal}m`;
+
+                const row = document.createElement('div');
+                row.className = "grid grid-cols-2 py-0.5 border-b border-slate-900 last:border-0";
+                
+                let textStyle = "text-slate-400";
+                if (step.nodeId === key) textStyle = "text-amber-400 font-bold";
+                else if (step.neighborId === key) textStyle = step.isRelaxed ? "text-emerald-400 font-bold" : "text-sky-400";
+
+                row.innerHTML = `
+                    <span class="${textStyle}">${nodeName}</span>
+                    <span class="text-right ${textStyle}">${displayDist}</span>
+                `;
+                distStateContainer.appendChild(row);
+            });
+
+            // Update status logs
+            updateOutputBanner(
+                step.type, 
+                step.message || 'Initializing priority configurations...', 
+                step.type === 'TARGET_REACHED' ? 'emerald' : step.type === 'RELAX' && step.isRelaxed ? 'emerald' : 'slate',
+                {
+                    path: step.highlightPath,
+                    distance: step.distances[step.nodeId] === Infinity ? 0 : step.distances[step.nodeId]
+                }
+            );
+        }
+
+
+        // =========================================================================
+        // ================== CUSTOM ALERTS & MODALS SYSTEM ========================
+        // =========================================================================
+        let alertTimeout = null;
+
+        function showCustomAlert(title, message, type = "info") {
+            const box = document.getElementById('custom-alert-box');
+            const alertTitle = document.getElementById('alert-title');
+            const alertMsg = document.getElementById('alert-message');
+            const iconWrap = document.getElementById('alert-icon');
+
+            alertTitle.textContent = title;
+            alertMsg.textContent = message;
+
+            // Configure design elements for type presets
+            if (type === "success") {
+                iconWrap.className = "p-2 rounded-lg bg-emerald-950 border border-emerald-900 text-emerald-400 shrink-0";
+                iconWrap.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+            } else if (type === "warning" || type === "danger") {
+                iconWrap.className = "p-2 rounded-lg bg-rose-950 border border-rose-900 text-rose-400 shrink-0";
+                iconWrap.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+            } else {
+                iconWrap.className = "p-2 rounded-lg bg-indigo-950 border border-indigo-900 text-indigo-400 shrink-0";
+                iconWrap.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+            }
+
+            box.className = "fixed bottom-6 left-6 max-w-sm bg-slate-900/95 backdrop-blur-md border border-slate-800 rounded-xl shadow-2xl p-4 z-50 transform translate-y-0 opacity-100 transition-all duration-300 flex items-start gap-3";
+            box.style.pointerEvents = "auto";
+
+            if (alertTimeout) clearTimeout(alertTimeout);
+            alertTimeout = setTimeout(dismissAlert, 5000); // Expiry time
+        }
+
+        function dismissAlert() {
+            const box = document.getElementById('custom-alert-box');
+            box.className = "fixed bottom-6 left-6 max-w-sm bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-4 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 flex items-start gap-3";
+            box.style.pointerEvents = "none";
+        }
+
+        function toggleSetupModal(isVisible) {
+            const modal = document.getElementById('doc-modal');
+            if (isVisible) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+
+        // =========================================================================
+        // =========================== INITIALIZATION ==============================
+        // =========================================================================
+        
+        window.addEventListener('load', () => {
+            // Setup selections and interfaces
+            populateNodeSelectors();
+            renderHashMapUI();
+            renderAdjacencyListUI();
+            rebuildBlockingModuleUI();
+            renderStackUI();
+            renderQueueUI();
+
+            // Setup Event Handlers
+            document.getElementById('btn-find-path').addEventListener('click', executePathfind);
+            document.getElementById('btn-visualize-path').addEventListener('click', executePathfindVisualWalkthrough);
+
+            // Path dropdown change handlers
+            document.getElementById('path-source').addEventListener('change', () => {
+                cancelActiveWalkthrough();
+                executePathfind();
+            });
+            document.getElementById('path-dest').addEventListener('change', () => {
+                cancelActiveWalkthrough();
+                executePathfind();
+            });
+
+            // Resizing visual elements
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            // Run initial pathfinder for user convenience
+            executePathfind();
+        });
+    </script>
+</body>
+</html>
